@@ -36,6 +36,7 @@ function i0 = optimal_i0(i, a, b)
 end
 
 %Compute i0 given all the paramters
+%Note: The 255 is because A is out of 0-255, not 0-1, so dividing would make everything too small
 function i0 = get_i0(i, a, b, c)
     i0 = ((i-c*b).*(255./a));
 end

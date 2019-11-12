@@ -1,5 +1,5 @@
-%vidObj = VideoReader('checkers.mp4');
-%calibFrames = read(vidObj);
+vidObj = VideoReader('bars.mp4');
+calibFrames = read(vidObj);
 
 %Read in the sample frames
 %These were made in GIMP by adding two layers
@@ -9,9 +9,16 @@
 %Then two calibration images were made to allow max an min
 %This should be the same as a checkerboard
 %TODO: lets try this on real images!
-calibFrames(:,:,:,1) = double(imread('testcalibleft2.png'));
-calibFrames(:,:,:,2) = double(imread('testcalibright2.png'));
-i = double(imread('testimg2.png'));
+% calibFrames(:,:,:,1) = double(imread('testcalibleft2.png'));
+% calibFrames(:,:,:,2) = double(imread('testcalibright2.png'));
+
+% for f = 1:10
+%    calibFrames(:,:,:,f) = double(imread("Calibration Moist\c" + f + ".jpg")); 
+%    disp("Loaded image #" + f)
+% end
+
+% i = double(imread('testimg2.png'));
+i = double(imread('t1.jpg'));
 
 Imax = max(calibFrames,[],4);
 Imin = min(calibFrames,[],4);
@@ -26,12 +33,14 @@ imshow(i0)
 
 %Compute the optimal i0 one channel at a time
 function i0 = optimal_i0(i, a, b)
+    disp('Beginning optimization')
     i0 = uint8(zeros(size(i)));
-    for x = 1:size(i0, 3)
-        c = optimal_c(i(:,:,x), a(:,:,x), b(:,:,x))
+    for x = 1:size(i0, 3)   % For each color dimension - if grayscale, only 1 dimension present, if color, 3 (rgb)
+        disp("Finding optimal c" + x)
+        c = optimal_c(i(:,:,x), a(:,:,x), b(:,:,x));
+        disp("Recovering i0 on channel" + x)
         ci0 = get_i0(i(:,:,x), a(:,:,x), b(:,:,x), c);
         i0(:,:,x) = uint8(ci0);
-        
     end
 end
 
@@ -45,13 +54,13 @@ end
 function n = gradient_norm(i, a, b, c)
     i0 = get_i0(i, a, b, c);
     [grad,~] = imgradient(i0);
-    n = norm(grad); %NOTE: NOT L1 NORM! %This worked *much* better
+    n = norm(grad) %NOTE: NOT L1 NORM! %This worked *much* better
 end
 
 %Caluclate the optimal C by iterating over gradient norms
 %Uses fancy-dancy anonomous functions and partial application
-function c = optimal_c(i, a, b)
+function c_star = optimal_c(i, a, b)
     partial_func = @(c) gradient_norm(i, a, b, c);
-    c = fminsearch(partial_func, 0.5);
+    c_star = fminsearch(partial_func, 0.5)
 end
 

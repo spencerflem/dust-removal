@@ -60,7 +60,7 @@ end
 function n = gradient_norm(i, a, b, c)
     i0 = get_i0(i, a, b, c);
     [grad,~] = imgradient(i0);
-    n = norm(grad) %NOTE: NOT L1 NORM! %This worked *much* better
+    n = norm(grad,1) %NOTE: NOT L1 NORM! %This worked *much* better
 end
 
 %Caluclate the optimal C by iterating over gradient norms

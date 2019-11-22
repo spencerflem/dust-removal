@@ -16,21 +16,27 @@ clear
 clc
 
 calib_num = 14;
-src = "pocket_dust";
+src = './pocket_dust';
 
-for f = 1:calib_num 
-   calibFrames(:,:,:,f) = double(imread("water\c" + f + ".jpg")); 
+for f = 1:calib_num
+   calibFrames(:,:,:,f) = double(imread([src, '/c', int2str(f), '.jpg'])); 
    disp("Loaded image #" + f)
 end
 
 % i = double(imread('testimg2.png'));
-i = double(imread(src + "\t1.jpg"));
+i = double(imread([src, '/t1.jpg']));
 
 Imax = max(calibFrames,[],4);
 Imin = min(calibFrames,[],4);
 
-a = Imax - Imin;
-b = Imin;
+top = median(median(Imax,1),2);
+bot = median(median(Imin,1),2);
+
+Smax = 255*(Imax-bot)./(top-bot);
+Smin = 255*(Imin-bot)./(top-bot);
+
+a = Smax - Smin;
+b = Smin;
 
 i0 = optimal_i0(i, a, b);
 

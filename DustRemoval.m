@@ -1,5 +1,5 @@
-vidObj = VideoReader('bars.mp4');
-calibFrames = read(vidObj);
+% vidObj = VideoReader('bars.mp4');
+% calibFrames = read(vidObj);
 
 %Read in the sample frames
 %These were made in GIMP by adding two layers
@@ -12,13 +12,19 @@ calibFrames = read(vidObj);
 % calibFrames(:,:,:,1) = double(imread('testcalibleft2.png'));
 % calibFrames(:,:,:,2) = double(imread('testcalibright2.png'));
 
-% for f = 1:10
-%    calibFrames(:,:,:,f) = double(imread("Calibration Moist\c" + f + ".jpg")); 
-%    disp("Loaded image #" + f)
-% end
+clear
+clc
+
+calib_num = 14;
+src = "pocket_dust";
+
+for f = 1:calib_num 
+   calibFrames(:,:,:,f) = double(imread("water\c" + f + ".jpg")); 
+   disp("Loaded image #" + f)
+end
 
 % i = double(imread('testimg2.png'));
-i = double(imread('t1.jpg'));
+i = double(imread(src + "\t1.jpg"));
 
 Imax = max(calibFrames,[],4);
 Imin = min(calibFrames,[],4);
@@ -28,7 +34,7 @@ b = Imin;
 
 i0 = optimal_i0(i, a, b);
 
-imwrite(i0, 'x_testi0.png')
+imwrite(i0, src + "\x_testi0.png")
 imshow(i0)
 
 %Compute the optimal i0 one channel at a time

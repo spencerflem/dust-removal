@@ -15,16 +15,16 @@
 clear
 clc
 
-calib_num = 14;
-src = './pocket_dust';
+calib_num = 10;
+src = "linty_far";
 
 for f = 1:calib_num
-   calibFrames(:,:,:,f) = double(imread([src, '/c', int2str(f), '.jpg'])); 
+   calibFrames(:,:,:,f) = double(imread(src + "/c" + f + ".jpg")); 
    disp("Loaded image #" + f)
 end
 
 % i = double(imread('testimg2.png'));
-i = double(imread([src, '/t1.jpg']));
+i = double(imread(src + "/t1.jpg"));
 
 Imax = max(calibFrames,[],4);
 Imin = min(calibFrames,[],4);
@@ -35,8 +35,11 @@ bot = median(median(Imin,1),2);
 Smax = 255*(Imax-bot)./(top-bot);
 Smin = 255*(Imin-bot)./(top-bot);
 
-a = Smax - Smin;
-b = Smin;
+% a = Smax - Smin;
+% b = Smin;
+
+a = Imax - Imin;
+b = Imin;
 
 i0 = optimal_i0(i, a, b);
 
@@ -59,14 +62,14 @@ end
 %Compute i0 given all the paramters
 %Note: The 255 is because A is out of 0-255, not 0-1, so dividing would make everything too small
 function i0 = get_i0(i, a, b, c)
-    i0 = ((i-c*b).*(255./a));
+    i0 = ((i-c*b)./(a./255));
 end
 
 %Calculate the gradient norm (what the optimizer wants to minimize)
 function n = gradient_norm(i, a, b, c)
     i0 = get_i0(i, a, b, c);
     [grad,~] = imgradient(i0);
-    n = norm(grad,1) %NOTE: NOT L1 NORM! %This worked *much* better
+    n = norm(grad, 1)
 end
 
 %Caluclate the optimal C by iterating over gradient norms

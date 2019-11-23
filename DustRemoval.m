@@ -35,11 +35,11 @@ bot = median(median(Imin,1),2);
 Smax = 255*(Imax-bot)./(top-bot);
 Smin = 255*(Imin-bot)./(top-bot);
 
-% a = Smax - Smin;
-% b = Smin;
+a = Smax - Smin;
+b = Smin;
 
-a = Imax - Imin;
-b = Imin;
+% a = Imax - Imin;
+% b = Imin;
 
 i0 = optimal_i0(i, a, b);
 
@@ -69,7 +69,7 @@ end
 function n = gradient_norm(i, a, b, c)
     i0 = get_i0(i, a, b, c);
     [grad,~] = imgradient(i0);
-    n = norm(grad, 1)
+    n = norm(grad, 2)
 end
 
 %Caluclate the optimal C by iterating over gradient norms
